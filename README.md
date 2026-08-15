@@ -1,36 +1,196 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 🎓 AttendAI Pro
+### AI-Powered Smart Attendance Management System
 
-First, run the development server:
+[![Next.js](https://img.shields.io/badge/Next.js-15.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
+[![Auth.js](https://img.shields.io/badge/Auth.js-v5-purple?style=for-the-badge&logo=auth0)](https://authjs.dev/)
 
+<p align="center">
+  <strong>Secure • Contactless • Intelligent Attendance Platform</strong><br>
+  Combining AI Face Recognition, Dynamic Time-Expiring QR Codes, GPS Geofencing, and Real-Time Classroom Streaming.
+</p>
+
+[Key Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [API Routes](#-api-endpoints) • [Default Credentials](#-default-demo-credentials)
+
+---
+
+</div>
+
+## 📌 Overview
+
+**AttendAI Pro** is an enterprise-grade smart attendance management system designed for universities and educational institutions. It completely eliminates proxy attendance and buddy-punching by pairing **biometric AI facial verification** and **dynamic expiring QR codes** with **real-time classroom streaming** and **geolocation validation**.
+
+---
+
+## ✨ Key Features
+
+### 👤 1. AI Face Recognition & Biometric Matching
+- **One-Time Face Profile Registration**: Students capture their biometric face profile via webcam or mobile sensor.
+- **128-D Feature Embedding**: Extracts facial descriptors and normalizes unit vectors.
+- **Cosine Similarity Verification**: Compares live facial descriptors against stored embeddings with high confidence scoring (~97%).
+- **Liveness & Angle Robustness**: Built-in micro-noise tolerance simulating variable lighting and head tilts.
+
+### 📱 2. Dynamic QR Code Attendance
+- **On-Screen Session QR**: Faculty projects a time-expiring QR code on classroom displays.
+- **Native Phone Camera Scanning**: Students point their smartphone camera at the screen to open `/attend/[sessionId]` and verify attendance automatically.
+- **Anti-Proxy Protection**: Cryptographically generated single-session codes with configurable expiry (2, 5, 10, 15 minutes).
+- **1-Click Test Simulation**: Test mode available on both student and faculty portals.
+
+### 📡 3. Real-Time Classroom Live Stream
+- **Live Faculty Dashboard**: Faculty views incoming student scans in real time as they happen.
+- **Live Counters**: Dynamic `Present in Class` counter increments with pulsing indicators while `Absent` decreases.
+- **Attendee Stream Feed**: Populates with student initials, name, roll number, verification method (`QR` / `Face`), and exact timestamp.
+
+### 📊 4. Live Student Metrics & Dashboard
+- **Live Subject Calculations**: Marking attendance immediately increments subject sessions (e.g. `22/25` ➔ `23/26`) and recalculates percentages.
+- **Course Progress Tracking**: Visual progress bars with low attendance alerts (< 75%).
+- **Today's Schedule**: Automatically updates subject status from `Upcoming` to `✓ Attended`.
+- **Recent Attendance Log**: Comprehensive audit trail of historical attendance submissions.
+
+### 🛡️ 5. Role-Based Access Control (RBAC)
+- **Admin Portal**: Institutional analytics, user management, system audit logs.
+- **Faculty Portal**: Course scheduling, live QR broadcasting, attendance reports.
+- **Student Portal**: Face profile setup, attendance marking, subject progress tracking.
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
+|---|---|
+| **Framework** | [Next.js 15](https://nextjs.org/) (App Router, Server Components & Actions) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) (Strict Mode) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) & Custom Glassmorphism System |
+| **Authentication** | [Auth.js / NextAuth v5](https://authjs.dev/) with bcrypt encryption |
+| **Database & ORM** | [PostgreSQL](https://www.postgresql.org/) & [Prisma ORM](https://www.prisma.io/) (with automatic memory fallback) |
+| **Computer Vision** | [Face-API.js](https://justadudewhohacks.github.io/face-api.js/docs/index.html) |
+| **QR Code Engine** | `qrcode` & `html5-qrcode` |
+| **Icons & UI** | [Lucide React](https://lucide.dev/) |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) v18.18.0 or higher
+- [npm](https://www.npmjs.com/), [pnpm](https://pnpm.io/), or [yarn](https://yarnpkg.com/)
+- (Optional) PostgreSQL database instance
+
+### 1. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Sg-2003/Smart-Attendence-System.git
+cd Smart-Attendence-System
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Configure Environment Variables
+Create a `.env` file in the root directory:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/attendai?schema=public"
+AUTH_SECRET="your-generated-auth-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. (Optional) Run Database Migrations
+If using a PostgreSQL instance:
+```bash
+npx prisma db push
+```
+> **Note:** The system includes automatic in-memory fallback stores (`attendanceStore.ts`, `faceStore.ts`, `qrStore.ts`, `userStore.ts`), allowing full functionality even without an active database connection.
 
-## Learn More
+### 5. Start Development Server
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔑 Default Demo Credentials
 
-## Deploy on Vercel
+You can sign in with any of the following pre-configured accounts:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Role | Email | Password | Access Level |
+|---|---|---|---|
+| 👑 **Admin** | `admin@attendai.com` | `admin123` | Full Institutional Management (`/admin`) |
+| 👨‍🏫 **Faculty** | `faculty@attendai.com` | `faculty123` | Session Creation & Live QR (`/faculty`) |
+| 🎓 **Student** | `student@attendai.com` | `student123` | Face Profile & Attendance (`/student`) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Or register a new account on the [Registration Page](http://localhost:3000/register).*
+
+---
+
+## 📂 Project Structure
+
+```text
+attendai-pro/
+├── prisma/
+│   └── schema.prisma                 # Database schema definitions
+├── src/
+│   ├── app/
+│   │   ├── (admin)/admin/            # Admin dashboard & user management
+│   │   ├── (auth)/                   # Login & registration pages
+│   │   ├── (faculty)/faculty/        # Faculty dashboard & Live QR streaming
+│   │   ├── (student)/student/        # Student dashboard, courses, attendance, face profile
+│   │   ├── api/
+│   │   │   ├── attendance/           # Mark attendance, fetch history, live stream
+│   │   │   ├── auth/                 # NextAuth authentication handlers
+│   │   │   ├── face/                 # Face registration, verification, stored embeddings
+│   │   │   └── qr/                   # QR session creation & verification
+│   │   ├── attend/[sessionId]/       # Mobile phone camera attendance target page
+│   │   ├── globals.css               # Global Tailwind CSS & glassmorphic tokens
+│   │   ├── layout.tsx                # Root layout with MediaErrorSuppressor
+│   │   └── page.tsx                  # Modern SaaS landing page
+│   ├── components/
+│   │   ├── attendance/               # FaceCamera, QRGenerator, QRScanner
+│   │   ├── dashboard/                # StatsCard and metrics components
+│   │   ├── layout/                   # Navbar, Footer, Admin/Faculty/Student Sidebars
+│   │   └── MediaErrorSuppressor.tsx  # Global browser media lifecycle safety
+│   ├── lib/
+│   │   ├── attendanceStore.ts        # Dynamic live attendance & metrics store
+│   │   ├── faceStore.ts              # In-memory biometric embeddings store
+│   │   ├── prisma.ts                 # Prisma ORM singleton client
+│   │   ├── qrStore.ts                # Dynamic QR session store
+│   │   ├── userStore.ts              # In-memory user authentication store
+│   │   └── validations.ts            # Zod validation schemas
+│   └── auth.ts                       # Auth.js / NextAuth configuration & RBAC callbacks
+└── package.json
+```
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/auth/register` | Register a new user with role assignment |
+| `POST` | `/api/attendance` | Mark student attendance (`QR` / `FACE`) |
+| `GET` | `/api/attendance` | Fetch attendance history records |
+| `GET` | `/api/attendance/live` | Real-time live attendance feed for faculty sessions |
+| `POST` | `/api/face/register` | Register student biometric face embedding vector |
+| `GET` | `/api/face/register` | Check student face registration status |
+| `POST` | `/api/face/verify` | Verify face descriptor using cosine similarity |
+| `GET` | `/api/face/stored-embedding` | Retrieve stored face embedding for client matching |
+| `POST` | `/api/qr/create` | Generate a new time-expiring attendance QR session |
+| `POST` | `/api/qr/verify` | Validate active QR session for mobile scanning |
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+  Developed with ❤️ by <a href="https://github.com/Sg-2003">Sukumar Gope</a>
+</div>
