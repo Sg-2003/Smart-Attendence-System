@@ -14,7 +14,7 @@
   Combining AI Face Recognition, Dynamic Time-Expiring QR Codes, GPS Geofencing, and Real-Time Classroom Streaming.
 </p>
 
-[Key Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [API Routes](#-api-endpoints) • [Default Credentials](#-default-demo-credentials)
+[Key Features](#-key-features) • [Architecture Diagrams](#-system-architecture--structural-diagrams) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [API Routes](#-api-endpoints) • [Default Credentials](#-default-demo-credentials)
 
 ---
 
@@ -23,6 +23,173 @@
 ## 📌 Overview
 
 **AttendAI Pro** is an enterprise-grade smart attendance management system designed for universities and educational institutions. It completely eliminates proxy attendance and buddy-punching by pairing **biometric AI facial verification** and **dynamic expiring QR codes** with **real-time classroom streaming** and **geolocation validation**.
+
+---
+
+## 📐 System Architecture & Structural Diagrams
+
+### 1. High-Level System Architecture
+
+```mermaid
+graph TB
+    subgraph Client_Tier ["🖥️ Client Tier (Responsive Web & Mobile)"]
+        A1["📱 Student Mobile Camera<br>(Native QR Scanner)"]
+        A2["💻 Student Web Portal<br>(Face Camera / On-Screen QR)"]
+        A3["👨‍🏫 Faculty Dashboard<br>(Live QR Broadcast & Stream)"]
+        A4["👑 Admin Console<br>(Analytics & User Management)"]
+    end
+
+    subgraph Application_Tier ["⚡ Next.js 15 Application Tier (App Router)"]
+        subgraph Security_Layer ["🔒 Security & RBAC"]
+            B1["Auth.js v5 (NextAuth)<br>JWT & Session Management"]
+            B2["Zod Schema Validation"]
+            B3["Role-Based Middleware<br>(ADMIN / FACULTY / STUDENT)"]
+        end
+
+        subgraph AI_Engine ["🤖 AI Computer Vision Engine"]
+            C1["Face-API.js Detection<br>(TinyFaceDetector)"]
+            C2["128-D Feature Embedding<br>Extraction & Normalizer"]
+            C3["Cosine Similarity Engine<br>(Threshold >= 0.82)"]
+        end
+
+        subgraph Attendance_Engine ["📡 Attendance Processing Engine"]
+            D1["Dynamic QR Session Generator<br>(Crypto Nonce & Expiry)"]
+            D2["GPS Geofencing Validator"]
+            D3["Real-Time Live Polling &<br>Stream Dispatcher"]
+        end
+    end
+
+    subgraph Persistence_Tier ["🗄️ Persistence & Storage Tier"]
+        E1["Prisma ORM Client"]
+        E2[("PostgreSQL Database")]
+        E3["Dynamic Memory Fallback Stores<br>(attendanceStore, faceStore, qrStore)"]
+    end
+
+    %% Client to App Layer Connections
+    A1 -->|Scans QR URL /attend/:id| D1
+    A2 -->|Transmits Facial Descriptor| C2
+    A3 -->|Creates Live QR / Polls Stream| D3
+    A4 -->|Queries System Analytics| B3
+
+    %% App Layer to Persistence Connections
+    C3 -->|Validates Stored Profile| E1
+    D1 -->|Saves Session State| E1
+    D2 -->|Logs Geolocation & Timestamp| E1
+    E1 -->|Primary Storage| E2
+    E1 -.->|Fallback when DB offline| E3
+```
+
+---
+
+### 2. End-to-End Attendance Verification Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Faculty as 👨‍🏫 Faculty
+    actor Student as 🎓 Student (Mobile/Web)
+    participant Server as ⚡ Next.js API & Security
+    participant AI as 🤖 AI Biometric Engine
+    participant DB as 🗄️ Database / Store
+    participant LiveStream as 📡 Faculty Live Stream
+
+    %% Phase 1: Faculty Starts Session
+    rect rgb(240, 245, 255)
+    Note over Faculty,LiveStream: Phase 1: Dynamic Session Generation
+    Faculty->>Server: POST /api/qr/create { courseId, expiryMinutes }
+    Server->>DB: Create QRSession with crypto code & expiry
+    Server-->>Faculty: Return { sessionId, attendUrl, expiresAt }
+    Faculty->>Faculty: Display Dynamic QR on Classroom Screen
+    end
+
+    %% Phase 2: Student Marks Attendance
+    rect rgb(240, 255, 245)
+    Note over Faculty,LiveStream: Phase 2: Student Scanning & Biometric Verification
+    alt Mobile QR Code Scan
+        Student->>Student: Points Native Phone Camera at Screen
+        Student->>Server: GET /attend/:sessionId?course=:id
+        Server->>DB: POST /api/qr/verify (Check expiry & status)
+        Server->>DB: POST /api/attendance (Log GPS & Student Record)
+    else AI Face Recognition
+        Student->>AI: Capture Webcam Stream
+        AI->>AI: Extract 128-D Facial Vector
+        Student->>Server: POST /api/face/verify { faceEmbedding }
+        Server->>DB: Query Registered FaceProfile
+        Server->>AI: Compute Cosine Similarity (Score >= 82%)
+        Server->>DB: POST /api/attendance { method: 'FACE' }
+    end
+    end
+
+    %% Phase 3: Real-Time Broadcast & Dashboard Update
+    rect rgb(255, 250, 240)
+    Note over Faculty,LiveStream: Phase 3: Real-Time Synchronization
+    Server->>LiveStream: Broadcast Attendee Pop-in Event
+    LiveStream-->>Faculty: Increment "Present" Counter & Animate Badge
+    Server-->>Student: Update Subject Progress (e.g. 22/25 ➔ 23/26)
+    end
+```
+
+---
+
+### 3. Entity Relationship & Data Model (ERD)
+
+```mermaid
+erDiagram
+    USER ||--o{ ATTENDANCE : "marks"
+    USER ||--o| FACE_PROFILE : "registers"
+    USER ||--o{ QR_SESSION : "creates (Faculty)"
+    COURSE ||--o{ ATTENDANCE : "records"
+    COURSE ||--o{ QR_SESSION : "hosts"
+
+    USER {
+        string id PK
+        string name
+        string email UK
+        string password
+        string role "STUDENT | FACULTY | ADMIN"
+        string department
+        string rollNumber
+        datetime createdAt
+    }
+
+    FACE_PROFILE {
+        string id PK
+        string userId FK, UK
+        string faceEmbedding "128-D Vector JSON"
+        boolean verified
+        datetime updatedAt
+    }
+
+    COURSE {
+        string id PK
+        string code UK
+        string name
+        int credits
+        string facultyName
+        string scheduleTime
+        string room
+    }
+
+    QR_SESSION {
+        string id PK
+        string code UK
+        string courseId FK
+        string createdById FK
+        datetime expiresAt
+        datetime createdAt
+    }
+
+    ATTENDANCE {
+        string id PK
+        string studentId FK
+        string courseId FK
+        string method "QR | FACE | MANUAL"
+        string status "PRESENT | LATE | ABSENT"
+        string location "GPS Lat,Long"
+        datetime date
+        datetime time
+    }
+```
 
 ---
 
