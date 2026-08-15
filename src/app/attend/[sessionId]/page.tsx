@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -15,7 +15,7 @@ import {
 
 type Status = "verifying" | "marking" | "success" | "error" | "expired" | "login-required";
 
-export default function AttendPage() {
+function AttendContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const sessionId = params.sessionId as string;
@@ -235,5 +235,19 @@ export default function AttendPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function AttendPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-900">
+          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        </div>
+      }
+    >
+      <AttendContent />
+    </Suspense>
   );
 }

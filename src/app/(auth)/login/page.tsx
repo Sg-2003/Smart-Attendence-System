@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Eye, EyeOff, Loader2, AlertCircle, LogIn } from "lucide-react";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "";
@@ -38,7 +38,6 @@ export default function LoginPage() {
       if (result?.error) {
         setServerError("Invalid email or password. Please try again.");
       } else {
-        // Let middleware redirect to the right dashboard
         router.refresh();
         if (callbackUrl) {
           router.push(callbackUrl);
@@ -165,9 +164,9 @@ export default function LoginPage() {
           🎓 Demo Accounts
         </p>
         <div className="space-y-1 text-xs text-blue-600 dark:text-blue-400">
-          <div>Admin: admin@attendai.pro / Admin@1234</div>
-          <div>Faculty: faculty@attendai.pro / Faculty@1234</div>
-          <div>Student: student@attendai.pro / Student@1234</div>
+          <div>Admin: admin@attendai.com / admin123</div>
+          <div>Faculty: faculty@attendai.com / faculty123</div>
+          <div>Student: student@attendai.com / student123</div>
         </div>
       </div>
 
@@ -182,5 +181,19 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full max-w-md p-10 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
