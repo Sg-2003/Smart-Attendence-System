@@ -1,0 +1,28 @@
+import { DefaultSession } from "next-auth";
+import { JWT } from "next-auth/jwt";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      role: "STUDENT" | "FACULTY" | "ADMIN";
+      department?: string | null;
+      semester?: number | null;
+    } & DefaultSession["user"];
+  }
+
+  interface User {
+    role: "STUDENT" | "FACULTY" | "ADMIN";
+    department?: string | null;
+    semester?: number | null;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    role: "STUDENT" | "FACULTY" | "ADMIN";
+    department?: string | null;
+    semester?: number | null;
+  }
+}
