@@ -6,12 +6,17 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel)](https://attendai-pro.vercel.app)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
 [![Auth.js](https://img.shields.io/badge/Auth.js-v5-purple?style=for-the-badge&logo=auth0)](https://authjs.dev/)
 
 <p align="center">
   <strong>Secure • Contactless • Intelligent Attendance Platform</strong><br>
   Combining AI Face Recognition, Dynamic Time-Expiring QR Codes, GPS Geofencing, and Real-Time Classroom Streaming.
+</p>
+
+<p align="center">
+  🌐 <strong>Live Production URL:</strong> <a href="https://attendai-pro.vercel.app">https://attendai-pro.vercel.app</a>
 </p>
 
 [Key Features](#-key-features) • [Architecture Diagrams](#-system-architecture--structural-diagrams) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [API Routes](#-api-endpoints) • [Default Credentials](#-default-demo-credentials)
