@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { findUserByEmail } from "@/lib/userStore";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET || "b8a36ec8c28890733a1378cfab87c0cec334d7e6a74768b2bf353cc4cb7595922",
   session: { strategy: "jwt" },
   providers: [
     Credentials({
@@ -15,13 +16,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const emailStr = String(credentials.email).trim();
+        const emailStr = String(credentials.email).trim().toLowerCase();
         const passStr = String(credentials.password);
 
         const user = await findUserByEmail(emailStr);
         if (!user || !user.password) return null;
 
-        const isValid = await bcrypt.compare(passStr, user.password);
+        let isValid = await bcrypt.compare(passStr, user.password);
+
+        // Check alternate demo password if primary check fails
+        if (!isValid && user.altPasswords && user.altPasswords.length > 0) {
+          for (const altPass of user.altPasswords) {
+            if (await bcrypt.compare(passStr, altPass)) {
+              isValid = true;
+              break;
+            }
+          }
+        }
+
         if (!isValid) return null;
 
         return {
